@@ -52,6 +52,3 @@ if (process.env.LOGFIRE_TOKEN) {
 
 - **dotenv** - Environment variable loading from `.env` files
 - **Justification:** Enables simple token configuration and future Settings UI migration path
-
-- **electron-store** - Application settings storage (future dependency)
-- **Justification:** Will be used for future Settings UI token storage, included now for dependency planning
