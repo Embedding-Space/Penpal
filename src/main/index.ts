@@ -2,6 +2,15 @@ import { app, shell, BrowserWindow, ipcMain, nativeTheme } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import 'dotenv/config'
+import * as logfire from 'logfire'
+
+// Configure Logfire
+logfire.configure({
+  serviceName: 'penpal-main',
+  serviceVersion: app.getVersion(),
+  console: true
+})
 
 function createWindow(): void {
   // Create the browser window.
@@ -40,6 +49,13 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  // Log application startup
+  logfire.info('Penpal app started', {
+    platform: process.platform,
+    arch: process.arch,
+    version: app.getVersion()
+  })
+
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
@@ -80,8 +96,13 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    logfire.info('Penpal app shutdown')
     app.quit()
   }
+})
+
+app.on('before-quit', () => {
+  logfire.info('Penpal app shutdown')
 })
 
 // In this file you can include the rest of your app's specific main process
