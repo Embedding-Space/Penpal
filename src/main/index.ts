@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import 'dotenv/config'
 import * as logfire from 'logfire'
+import { logger } from '../shared/logger'
 
 // Configure Logfire
 logfire.configure({
@@ -50,7 +51,7 @@ function createWindow(): void {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Log application startup
-  logfire.info('Penpal app started', {
+  logger.info('Penpal app started', {
     platform: process.platform,
     arch: process.arch,
     version: app.getVersion()
@@ -96,13 +97,13 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    logfire.info('Penpal app shutdown')
+    logger.info('Penpal app shutdown')
     app.quit()
   }
 })
 
 app.on('before-quit', () => {
-  logfire.info('Penpal app shutdown')
+  logger.info('Penpal app shutdown')
 })
 
 // In this file you can include the rest of your app's specific main process
