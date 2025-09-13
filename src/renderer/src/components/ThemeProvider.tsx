@@ -1,6 +1,6 @@
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useState } from 'react'
 
-type Theme = "dark" | "light" | "system"
+type Theme = 'dark' | 'light' | 'system'
 
 type ThemeProviderProps = {
   children: React.ReactNode
@@ -14,16 +14,16 @@ type ThemeProviderState = {
 }
 
 const initialState: ThemeProviderState = {
-  theme: "system",
-  setTheme: () => null,
+  theme: 'system',
+  setTheme: () => null
 }
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
-  storageKey = "vite-ui-theme",
+  defaultTheme = 'system',
+  storageKey = 'vite-ui-theme',
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(
@@ -34,22 +34,29 @@ export function ThemeProvider({
     const root = window.document.documentElement
 
     const applyTheme = async (currentTheme: Theme) => {
-      root.classList.remove("light", "dark")
+      root.classList.remove('light', 'dark')
 
-      if (currentTheme === "system") {
+      if (currentTheme === 'system') {
         // Use Electron's system theme detection if available, fallback to matchMedia
         if (window.api?.getSystemTheme) {
           try {
             const systemTheme = await window.api.getSystemTheme()
             root.classList.add(systemTheme)
           } catch (error) {
-            console.warn("Failed to get system theme from Electron, falling back to matchMedia:", error)
-            const fallbackTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+            console.warn(
+              'Failed to get system theme from Electron, falling back to matchMedia:',
+              error
+            )
+            const fallbackTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light'
             root.classList.add(fallbackTheme)
           }
         } else {
           // Fallback for non-Electron environments
-          const fallbackTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+          const fallbackTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light'
           root.classList.add(fallbackTheme)
         }
       } else {
@@ -62,10 +69,10 @@ export function ThemeProvider({
 
   // Listen for system theme changes from Electron
   useEffect(() => {
-    if (theme === "system" && window.api?.onSystemThemeChange) {
+    if (theme === 'system' && window.api?.onSystemThemeChange) {
       const unsubscribe = window.api.onSystemThemeChange((newTheme: string) => {
         const root = window.document.documentElement
-        root.classList.remove("light", "dark")
+        root.classList.remove('light', 'dark')
         root.classList.add(newTheme)
       })
 
@@ -78,7 +85,7 @@ export function ThemeProvider({
     setTheme: (theme: Theme) => {
       localStorage.setItem(storageKey, theme)
       setTheme(theme)
-    },
+    }
   }
 
   return (
@@ -91,8 +98,7 @@ export function ThemeProvider({
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext)
 
-  if (context === undefined)
-    throw new Error("useTheme must be used within a ThemeProvider")
+  if (context === undefined) throw new Error('useTheme must be used within a ThemeProvider')
 
   return context
 }
