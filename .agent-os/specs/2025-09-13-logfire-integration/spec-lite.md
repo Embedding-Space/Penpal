@@ -1,3 +1,3 @@
 # Spec Summary (Lite)
 
-Integrate Pydantic Logfire observability platform into Penpal's main and renderer processes with secure token storage via Electron's safeStorage API. The implementation enables application lifecycle monitoring with startup/shutdown events logged to Logfire dashboard, plus CLI tools for token management. Success is measured by seeing "Penpal app started" messages in Logfire when launching the application.
+Integrate Pydantic Logfire observability into Penpal's main process only using dotenv token management from `.env` files. The implementation enables basic application lifecycle monitoring with startup/shutdown events and platform metadata logged to Logfire dashboard. Success is measured by seeing "Penpal app started" messages with service name `penpal-main` in Logfire when launching the application with a configured token.

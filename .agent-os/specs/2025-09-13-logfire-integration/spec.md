@@ -5,7 +5,7 @@
 
 ## Overview
 
-Integrate Pydantic Logfire observability platform into the Penpal application to provide comprehensive monitoring and telemetry for both main Electron process and renderer processes. This feature will enable developers to track application startup, shutdown, and runtime events across the entire application lifecycle.
+Integrate Pydantic Logfire observability platform into Penpal's main Electron process to provide basic application lifecycle monitoring. This feature will enable developers to track application startup and shutdown events with secure token management via environment variables.
 
 ## User Stories
 
@@ -13,33 +13,35 @@ Integrate Pydantic Logfire observability platform into the Penpal application to
 
 As a developer working on Penpal, I want to see application lifecycle events in Logfire, so that I can monitor app health and debug issues effectively.
 
-The developer can configure a Logfire write token, launch the application, and immediately see startup events in their Logfire dashboard. When the application shuts down gracefully, a shutdown event is also logged, providing complete lifecycle visibility.
+The developer can configure a Logfire write token in a `.env` file, launch the application, and immediately see startup events with useful metadata (platform, architecture) in their Logfire dashboard. When the application shuts down gracefully, a shutdown event is also logged.
 
-### Seamless Development Workflow
+### Simple Token Management
 
-As a developer, I want simple CLI commands to manage Logfire credentials, so that I can quickly set up and tear down observability without manual configuration file editing.
+As a developer, I want straightforward token configuration via environment variables, so that I can easily enable/disable observability without complex setup.
 
-The developer can use npm run scripts to set or clear the Logfire write token, enabling quick iteration between different Logfire projects or temporarily disabling logging.
+The developer can add `LOGFIRE_TOKEN=their-token` to a `.env` file for immediate integration, with the approach designed to seamlessly support future Settings UI integration.
 
 ## Spec Scope
 
-1. **Secure Token Storage** - Implement encrypted storage of Logfire write tokens using Electron's safeStorage API
-2. **Main Process Integration** - Configure Logfire logging in the main Electron process with startup/shutdown events
-3. **Renderer Process Integration** - Set up Logfire browser integration for renderer processes
-4. **CLI Token Management** - Create npm scripts for setting and clearing Logfire write tokens
-5. **Environment Variable Handling** - Programmatically set LOGFIRE_TOKEN environment variable at runtime
+1. **Environment-Based Token Management** - Use dotenv to load Logfire write token from `.env` file
+2. **Main Process Integration** - Configure Logfire logging in the main Electron process with service metadata
+3. **Lifecycle Event Logging** - Log application startup and shutdown with useful diagnostic attributes
+4. **Security Protection** - Ensure no token leakage in logs, errors, or console output
+5. **Zero Configuration Overhead** - Application runs cleanly when no token is present
 
 ## Out of Scope
 
-- GUI-based token management interface
+- Renderer process integration (separate spec/issue)
+- GUI-based token management interface (future phase)
 - Custom Logfire dashboard creation
 - Integration with other observability platforms
-- Advanced log filtering or custom instrumentation beyond basic lifecycle events
-- Performance metrics collection beyond what Logfire provides by default
+- Advanced instrumentation beyond basic lifecycle events
+- Client traces proxy architecture
 
 ## Expected Deliverable
 
-1. Application launches successfully and logs "Penpal app started" message to Logfire dashboard
-2. Application shutdown gracefully logs "Penpal app shutdown" message to Logfire (stretch goal)
-3. Logfire write token can be set via `npm run logfire:set-token` command
-4. Logfire write token can be cleared via `npm run logfire:clear-token` command
+1. Application launches successfully and logs "Penpal app started" message to Logfire dashboard with platform/arch metadata
+2. Application shutdown gracefully logs "Penpal app shutdown" message to Logfire
+3. Logfire write token configured via `LOGFIRE_TOKEN` in `.env` file
+4. No errors or token exposure when token is not configured
+5. Service properly identified as `penpal-main` with app version in Logfire
