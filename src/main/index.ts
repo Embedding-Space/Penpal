@@ -8,7 +8,8 @@ import * as logfire from 'logfire'
 // Configure Logfire
 logfire.configure({
   serviceName: 'penpal-main',
-  serviceVersion: app.getVersion()
+  serviceVersion: app.getVersion(),
+  console: true
 })
 
 function createWindow(): void {
