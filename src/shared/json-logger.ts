@@ -19,7 +19,7 @@ function initializeLogFile(): void {
 // Initialize on module load
 initializeLogFile()
 
-export function writeJsonLog(level: string, message: string, data?: Record<string, any>): void {
+export function writeJsonLog(level: string, message: string, data?: Record<string, unknown>): void {
   try {
     const entry = {
       timestamp: new Date().toISOString(),
