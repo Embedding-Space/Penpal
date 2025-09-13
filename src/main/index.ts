@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import 'dotenv/config'
 import * as logfire from 'logfire'
+import { logger } from '../shared/logger'
 
 // Configure Logfire
 logfire.configure({
@@ -38,7 +39,7 @@ function createWindow(): void {
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    console.log("Loading URL:", process.env['ELECTRON_RENDERER_URL'])
+    console.log('Loading URL:', process.env['ELECTRON_RENDERER_URL'])
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
@@ -50,7 +51,7 @@ function createWindow(): void {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Log application startup
-  logfire.info('Penpal app started', {
+  logger.info('Penpal app started', {
     platform: process.platform,
     arch: process.arch,
     version: app.getVersion()
@@ -77,7 +78,7 @@ app.whenReady().then(() => {
   // Listen for system theme changes and notify renderer
   nativeTheme.on('updated', () => {
     const theme = nativeTheme.shouldUseDarkColors ? 'dark' : 'light'
-    BrowserWindow.getAllWindows().forEach(window => {
+    BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('system-theme-changed', theme)
     })
   })
@@ -96,13 +97,13 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    logfire.info('Penpal app shutdown')
+    logger.info('Penpal app shutdown')
     app.quit()
   }
 })
 
 app.on('before-quit', () => {
-  logfire.info('Penpal app shutdown')
+  logger.info('Penpal app shutdown')
 })
 
 // In this file you can include the rest of your app's specific main process

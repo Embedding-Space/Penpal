@@ -5,7 +5,7 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {
   getSystemTheme: () => ipcRenderer.invoke('get-system-theme'),
   onSystemThemeChange: (callback: (theme: string) => void) => {
-    const unsubscribe = () => ipcRenderer.removeAllListeners('system-theme-changed')
+    const unsubscribe = (): void => ipcRenderer.removeAllListeners('system-theme-changed')
     ipcRenderer.on('system-theme-changed', (_event, theme) => callback(theme))
     return unsubscribe
   }
