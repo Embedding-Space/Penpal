@@ -1,8 +1,15 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
-const api = {}
+const api = {
+  getSystemTheme: () => ipcRenderer.invoke('get-system-theme'),
+  onSystemThemeChange: (callback: (theme: string) => void) => {
+    const unsubscribe = () => ipcRenderer.removeAllListeners('system-theme-changed')
+    ipcRenderer.on('system-theme-changed', (_event, theme) => callback(theme))
+    return unsubscribe
+  }
+}
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

@@ -1,12 +1,11 @@
-import Versions from './components/Versions'
-import electronLogo from './assets/electron.svg'
+import { ThemeProvider } from "./components/ThemeProvider"
 
 function App(): React.JSX.Element {
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
-
   return (
-    <>
-    </>
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+      <div className="min-h-screen bg-background text-foreground">
+      </div>
+    </ThemeProvider>
   )
 }
 
