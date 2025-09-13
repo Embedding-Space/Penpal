@@ -7,13 +7,15 @@
 
 ### Features
 
-- [ ] Pydantic Logfire observability integration `L`
-- [ ] Basic agent creation and configuration `M`
-- [ ] SQLite database per agent setup `M`
-- [ ] OpenAI API integration (BYOK) `L`
-- [ ] Anthropic API integration (BYOK) `L`
+- [x] Pydantic Logfire observability integration `L`
+- [ ] Settings window with UI for configuring user preferences and secrets `L`
 - [ ] Simple chat interface with agent-centric design `L`
 - [ ] Agent list and management UI `M`
+- [ ] Basic agent creation and configuration `M`
+- [ ] SQLite database per agent setup `M`
+- [ ] GitHub Models API integration (BYOK) `L`
+- [ ] OpenAI API integration (BYOK) `L`
+- [ ] Anthropic API integration (BYOK) `L`
 - [ ] Basic conversation history storage and retrieval `M`
 
 ### Dependencies
@@ -37,13 +39,11 @@
 - [ ] Ollama local model integration `L`
 - [ ] LM Studio integration `L`
 - [ ] Advanced agent configuration (system prompts, parameters) `M`
-- [ ] Agent import/export functionality `M`
+- [ ] MCP (Model Context Protocol) support `L`
 
 ### Dependencies
 
 - Phase 1 completion
-- Model provider API implementations
-- Enhanced agent storage schema
 
 ## Phase 3: Polish & Advanced Features
 
@@ -52,14 +52,8 @@
 
 ### Features
 
-- [ ] Tool integration framework for agents `XL`
-- [ ] Advanced conversation search and filtering `M`
-- [ ] Model switching for existing agents `M`
-- [ ] Agent configuration templates `M`
-- [ ] Bulk agent operations `M`
 - [ ] Enhanced UI/UX polish `L`
 
 ### Dependencies
 
 - Phase 2 completion
-- Tool integration architecture design
