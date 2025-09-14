@@ -53,9 +53,8 @@ function startBackend(): void {
   })
 
   backendProcess.stderr?.on('data', (data: Buffer) => {
-    const error = data.toString()
-    console.error('Backend error:', error.trim())
-    logger.error('Backend error', { error: error.trim() })
+    const output = data.toString().trim()
+    logger.info('Backend output', { output })
   })
 
   backendProcess.on('close', (code: number) => {
