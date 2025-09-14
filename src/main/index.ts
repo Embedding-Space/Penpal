@@ -1,8 +1,10 @@
 import { app, shell, BrowserWindow, ipcMain, nativeTheme } from 'electron'
 import { join } from 'path'
+import { spawn } from 'child_process'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import 'dotenv/config'
+import 'fix-path'
 import * as logfire from 'logfire'
 import { logger } from '../shared/logger'
 
@@ -12,6 +14,69 @@ logfire.configure({
   serviceVersion: app.getVersion(),
   console: true
 })
+
+// Backend process management
+let backendProcess: ReturnType<typeof spawn> | null = null
+let backendUrl: string | null = null
+
+function startBackend(): void {
+  // In development, __dirname is src/main, in production it's out/main
+  // We need to go up to the project root and then into src/backend
+  const projectRoot = is.dev
+    ? join(__dirname, '../..') // src/main -> project root
+    : join(__dirname, '../..') // out/main -> project root
+  const backendPath = join(projectRoot, 'src', 'backend')
+
+  logger.info('Starting backend process', { backendPath })
+
+  backendProcess = spawn('uv', ['run', 'python', '-m', 'penpal_backend'], {
+    cwd: backendPath,
+    stdio: ['pipe', 'pipe', 'pipe']
+  })
+
+  backendProcess.stdout?.on('data', (data: Buffer) => {
+    const output = data.toString()
+    console.log('Backend:', output.trim())
+
+    // Parse port from uvicorn startup message
+    const portMatch = output.match(/Uvicorn running on http:\/\/localhost:(\d+)/)
+    if (portMatch) {
+      const port = portMatch[1]
+      backendUrl = `http://localhost:${port}`
+      logger.info('Backend started', { port, url: backendUrl })
+
+      // Notify renderer process of backend URL
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('backend-ready', backendUrl)
+      })
+    }
+  })
+
+  backendProcess.stderr?.on('data', (data: Buffer) => {
+    const error = data.toString()
+    console.error('Backend error:', error.trim())
+    logger.error('Backend error', { error: error.trim() })
+  })
+
+  backendProcess.on('close', (code: number) => {
+    logger.info('Backend process closed', { code })
+    backendProcess = null
+    backendUrl = null
+  })
+
+  backendProcess.on('error', (error: Error) => {
+    logger.error('Failed to start backend', { error: error.message })
+  })
+}
+
+function stopBackend(): void {
+  if (backendProcess) {
+    logger.info('Stopping backend process')
+    backendProcess.kill()
+    backendProcess = null
+    backendUrl = null
+  }
+}
 
 function createWindow(): void {
   // Create the browser window.
@@ -46,6 +111,11 @@ function createWindow(): void {
   }
 }
 
+// Start backend as early as possible
+app.on('will-finish-launching', () => {
+  startBackend()
+})
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -73,6 +143,11 @@ app.whenReady().then(() => {
   // Theme detection IPC handlers
   ipcMain.handle('get-system-theme', () => {
     return nativeTheme.shouldUseDarkColors ? 'dark' : 'light'
+  })
+
+  // Backend IPC handlers
+  ipcMain.handle('get-backend-url', () => {
+    return backendUrl
   })
 
   // Listen for system theme changes and notify renderer
@@ -104,6 +179,7 @@ app.on('window-all-closed', () => {
 
 app.on('before-quit', () => {
   logger.info('Penpal app shutdown')
+  stopBackend()
 })
 
 // In this file you can include the rest of your app's specific main process
