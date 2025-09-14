@@ -40,6 +40,8 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
+    logfire.instrument_fastapi(app)
+
     # Configure CORS for Electron frontend
     app.add_middleware(
         CORSMiddleware,
