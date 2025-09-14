@@ -36,7 +36,12 @@ function startBackend(): void {
 
   backendProcess.stdout?.on('data', (data: Buffer) => {
     const output = data.toString()
-    console.log('Backend:', output.trim())
+    console.log('Backend stdout:', output.trim())
+  })
+
+  backendProcess.stderr?.on('data', (data: Buffer) => {
+    const output = data.toString().trim()
+    console.log('Backend stderr:', output)
 
     // Parse port from uvicorn startup message
     const portMatch = output.match(/Uvicorn running on http:\/\/localhost:(\d+)/)
@@ -50,11 +55,6 @@ function startBackend(): void {
         window.webContents.send('backend-ready', backendUrl)
       })
     }
-  })
-
-  backendProcess.stderr?.on('data', (data: Buffer) => {
-    const output = data.toString().trim()
-    logger.info('Backend output', { output })
   })
 
   backendProcess.on('close', (code: number) => {
