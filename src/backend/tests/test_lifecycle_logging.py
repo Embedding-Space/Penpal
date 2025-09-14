@@ -1,5 +1,6 @@
 """Tests for application lifecycle logging."""
 
+import os
 from unittest.mock import patch
 
 import pytest
@@ -10,7 +11,7 @@ from penpal_backend.app import create_app
 
 def test_startup_logging():
     """Test that startup logging occurs when app starts."""
-    with patch.dict({"LOGFIRE_TOKEN": "test-token"}):
+    with patch.dict(os.environ, {"LOGFIRE_TOKEN": "test-token"}):
         with patch("penpal_backend.app.logfire.configure"):
             with patch("penpal_backend.app.logfire.info") as mock_info:
                 app = create_app()
@@ -28,7 +29,7 @@ def test_startup_logging():
 
 def test_shutdown_logging():
     """Test that shutdown logging occurs when app shuts down."""
-    with patch.dict({"LOGFIRE_TOKEN": "test-token"}):
+    with patch.dict(os.environ, {"LOGFIRE_TOKEN": "test-token"}):
         with patch("penpal_backend.app.logfire.configure"):
             with patch("penpal_backend.app.logfire.info") as mock_info:
                 app = create_app()
@@ -46,7 +47,7 @@ def test_shutdown_logging():
 
 def test_lifecycle_logging_without_token():
     """Test lifecycle logging works even without Logfire token."""
-    with patch.dict({}, clear=True):
+    with patch.dict(os.environ, {}, clear=True):
         with patch("penpal_backend.services.settings_manager.SettingsManager") as mock_settings_class:
             mock_settings = mock_settings_class.return_value
             mock_settings.logfire_token = None
@@ -74,7 +75,7 @@ def test_lifecycle_logging_without_token():
 
 def test_lifecycle_logging_message_content():
     """Test that lifecycle logging messages have correct content."""
-    with patch.dict({"LOGFIRE_TOKEN": "test-token"}):
+    with patch.dict(os.environ, {"LOGFIRE_TOKEN": "test-token"}):
         with patch("penpal_backend.app.logfire.configure"):
             with patch("penpal_backend.app.logfire.info") as mock_info:
                 app = create_app()
@@ -93,7 +94,7 @@ def test_lifecycle_logging_message_content():
 
 def test_lifecycle_logging_timing():
     """Test that startup happens before shutdown."""
-    with patch.dict({"LOGFIRE_TOKEN": "test-token"}):
+    with patch.dict(os.environ, {"LOGFIRE_TOKEN": "test-token"}):
         with patch("penpal_backend.app.logfire.configure"):
             with patch("penpal_backend.app.logfire.info") as mock_info:
                 app = create_app()
